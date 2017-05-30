@@ -38,13 +38,13 @@ export function enableBridge(bridge) {
   return execCmd(`ifconfig ${bridge} up`).then(() => null);
 }
 
-export function disableBridge(iface, bridge) {
+export function disableBridge(bridge) {
   debug(`About to disable bridge: ${bridge}`);
   return execCmd(`ifconfig ${bridge} down`).then(() => null);
 }
 
-export function deleteBridge(iface, bridge) {
+export function deleteBridge(bridge) {
   debug(`About to disable & delete bridge: ${bridge}`);
-  return disableBridge(iface, bridge)
+  return disableBridge(bridge)
     .then(execCmd(`brctl delbr ${bridge}`)).then(() => null);
 }

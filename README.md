@@ -63,6 +63,15 @@ brctl.deleteBridge('myBridge')
 
 ```
 
+
+## Enable debug of module
+
+This module uses [debug](https://www.npmjs.com/package/debug) for debugging, you can enable debug messages with:
+
+```
+DEBUG=brctl-wrapper
+```
+
 ## Run tests
 
 ```

@@ -1,6 +1,6 @@
 {
   "name": "brctl-wrapper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NodeJS wrapper for brctl command (virtual bridges on linux)",
   "author": "J. Victor Soto",
   "main": "./dist/index.js",

@@ -46,5 +46,5 @@ export function disableBridge(bridge) {
 export function deleteBridge(bridge) {
   debug(`About to disable & delete bridge: ${bridge}`);
   return disableBridge(bridge)
-    .then(execCmd(`brctl delbr ${bridge}`)).then(() => null);
+    .then(() => execCmd(`brctl delbr ${bridge}`)).then(() => null);
 }

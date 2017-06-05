@@ -3,11 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createBridge = createBridge;
-exports.addIfaceToBridge = addIfaceToBridge;
-exports.enableBridge = enableBridge;
-exports.disableBridge = disableBridge;
-exports.deleteBridge = deleteBridge;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _bluebird = require('bluebird');
 
@@ -16,6 +13,8 @@ var _bluebird2 = _interopRequireDefault(_bluebird);
 var _childProcessPromise = require('child-process-promise');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var debug = require('debug')('brctl-wrapper');
 
@@ -37,45 +36,67 @@ function execCmd(cmd) {
   });
 }
 
-function createBridge(bridge) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ifaces: [], enable: false };
+var BrctlWrapper = function () {
+  function BrctlWrapper() {
+    _classCallCheck(this, BrctlWrapper);
+  }
 
-  debug('About to create bridge: ' + bridge);
-  return execCmd('brctl addbr ' + bridge).then(function () {
-    return _bluebird2.default.all(options.ifaces.map(function (iface) {
-      return addIfaceToBridge(iface, bridge);
-    })).then(function () {
-      return options.enable ? enableBridge(bridge) : null;
-    });
-  });
-}
+  _createClass(BrctlWrapper, [{
+    key: 'createBridge',
+    value: function createBridge(bridge) {
+      var _this = this;
 
-function addIfaceToBridge(iface, bridge) {
-  debug('About to add iface: ' + iface + ' to bridge: ' + bridge);
-  return execCmd('brctl addif ' + bridge + ' ' + iface).then(function () {
-    return null;
-  });
-}
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ifaces: [], enable: false };
 
-function enableBridge(bridge) {
-  debug('About to enable bridge: ' + bridge);
-  return execCmd('ifconfig ' + bridge + ' up').then(function () {
-    return null;
-  });
-}
+      debug('About to create bridge: ' + bridge);
+      return execCmd('brctl addbr ' + bridge).then(function () {
+        return _bluebird2.default.all(options.ifaces.map(function (iface) {
+          return _this.addIfaceToBridge(iface, bridge);
+        })).then(function () {
+          return options.enable ? _this.enableBridge(bridge) : null;
+        });
+      });
+    }
+  }, {
+    key: 'addIfaceToBridge',
+    value: function addIfaceToBridge(iface, bridge) {
+      // eslint-disable-line class-methods-use-this
+      debug('About to add iface: ' + iface + ' to bridge: ' + bridge);
+      return execCmd('brctl addif ' + bridge + ' ' + iface).then(function () {
+        return null;
+      });
+    }
+  }, {
+    key: 'enableBridge',
+    value: function enableBridge(bridge) {
+      // eslint-disable-line class-methods-use-this
+      debug('About to enable bridge: ' + bridge);
+      return execCmd('ifconfig ' + bridge + ' up').then(function () {
+        return null;
+      });
+    }
+  }, {
+    key: 'disableBridge',
+    value: function disableBridge(bridge) {
+      // eslint-disable-line class-methods-use-this
+      debug('About to disable bridge: ' + bridge);
+      return execCmd('ifconfig ' + bridge + ' down').then(function () {
+        return null;
+      });
+    }
+  }, {
+    key: 'deleteBridge',
+    value: function deleteBridge(bridge) {
+      debug('About to disable & delete bridge: ' + bridge);
+      return this.disableBridge(bridge).then(function () {
+        return execCmd('brctl delbr ' + bridge);
+      }).then(function () {
+        return null;
+      });
+    }
+  }]);
 
-function disableBridge(bridge) {
-  debug('About to disable bridge: ' + bridge);
-  return execCmd('ifconfig ' + bridge + ' down').then(function () {
-    return null;
-  });
-}
+  return BrctlWrapper;
+}();
 
-function deleteBridge(bridge) {
-  debug('About to disable & delete bridge: ' + bridge);
-  return disableBridge(bridge).then(function () {
-    return execCmd('brctl delbr ' + bridge);
-  }).then(function () {
-    return null;
-  });
-}
+exports.default = new BrctlWrapper();

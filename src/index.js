@@ -22,11 +22,16 @@ function execCmd(cmd) {
 }
 
 class BrctlWrapper {
-  createBridge(bridge, options = { ifaces: [], enable: false }) {
+  createBridge(bridge, options = { ifaces: [], enable: false, ip: null }) {
     debug(`About to create bridge: ${bridge}`);
     return execCmd(`brctl addbr ${bridge}`)
       .then(() => Promise.all(options.ifaces.map(iface => this.addIfaceToBridge(iface, bridge)))
-        .then(() => options.enable ? this.enableBridge(bridge) : null));
+        .then(() => {
+          const promises = [];
+          if (options.ip) { promises.push(this.setBridgeIP(bridge, options.ip)); }
+          if (options.enable) { promises.push(this.enableBridge(bridge)); }
+          return Promise.all(promises);
+        }));
   }
 
   addIfaceToBridge(iface, bridge) { // eslint-disable-line class-methods-use-this
@@ -37,6 +42,11 @@ class BrctlWrapper {
   enableBridge(bridge) { // eslint-disable-line class-methods-use-this
     debug(`About to enable bridge: ${bridge}`);
     return execCmd(`ifconfig ${bridge} up`).then(() => null);
+  }
+
+  setBridgeIP(bridge, ip) { // eslint-disable-line class-methods-use-this
+    debug(`About to change bridge ${bridge} IP to: ${ip}`);
+    return execCmd(`ip addr add dev ${bridge} ${ip}`).then(() => null);
   }
 
   disableBridge(bridge) { // eslint-disable-line class-methods-use-this

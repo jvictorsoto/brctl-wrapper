@@ -50,6 +50,24 @@ brctl.createBridge('myBridge', bridgeOptions)
 
 ```
 
+### Set a custom ip to the bridge
+
+``` js
+import brtcl from 'brtcl-wrapper';
+
+const bridgeOptions = {
+  ifaces: ['eth0', 'eth1'],
+  enable: true,
+  ip: '10.255.1.22/24'
+};
+brctl.createBridge('myBridge', bridgeOptions)
+  .then(() => {
+    // ----- Bridge is up and with ip 10.255.1.22/24!
+  })
+  .catch(err => console.error('Error creating bridge: ', err));
+
+```
+
 ### Delete bridge
 
 ``` js

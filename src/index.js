@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { exec } from 'child-process-promise';
+import { exec } from 'child-process-es6-promise';
 
 const debug = require('debug')('brctl-wrapper');
 
@@ -10,7 +10,7 @@ function execCmd(cmd) {
     .then((result) => {
       debug(`Executed cmd: ${cmd}`, result);
       const { stdout, stderr } = result;
-      if (stderr.length > 0) {
+      if (stderr && stderr.length > 0) {
         return Promise.reject({ stdout, stderr });
       }
       return stdout;

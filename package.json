@@ -1,6 +1,6 @@
 {
   "name": "brctl-wrapper",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "NodeJS wrapper for brctl command (virtual bridges on linux)",
   "author": "J. Victor Soto",
   "main": "./dist/index.js",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
-    "child-process-promise": "^2.2.1",
+    "child-process-es6-promise": "^1.2.0",
     "debug": "^2.6.8"
   },
   "devDependencies": {

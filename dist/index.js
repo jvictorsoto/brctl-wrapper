@@ -10,7 +10,7 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _childProcessPromise = require('child-process-promise');
+var _childProcessEs6Promise = require('child-process-es6-promise');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21,12 +21,12 @@ var debug = require('debug')('brctl-wrapper');
 // Helper function to exec commands. TODO: Better error handler with custom error class...
 function execCmd(cmd) {
   debug('About to execute cmd: ' + cmd);
-  return (0, _childProcessPromise.exec)(cmd).then(function (result) {
+  return (0, _childProcessEs6Promise.exec)(cmd).then(function (result) {
     debug('Executed cmd: ' + cmd, result);
     var stdout = result.stdout,
         stderr = result.stderr;
 
-    if (stderr.length > 0) {
+    if (stderr && stderr.length > 0) {
       return _bluebird2.default.reject({ stdout: stdout, stderr: stderr });
     }
     return stdout;
@@ -46,14 +46,21 @@ var BrctlWrapper = function () {
     value: function createBridge(bridge) {
       var _this = this;
 
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ifaces: [], enable: false };
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ifaces: [], enable: false, ip: null };
 
       debug('About to create bridge: ' + bridge);
       return execCmd('brctl addbr ' + bridge).then(function () {
         return _bluebird2.default.all(options.ifaces.map(function (iface) {
           return _this.addIfaceToBridge(iface, bridge);
         })).then(function () {
-          return options.enable ? _this.enableBridge(bridge) : null;
+          var promises = [];
+          if (options.ip) {
+            promises.push(_this.setBridgeIP(bridge, options.ip));
+          }
+          if (options.enable) {
+            promises.push(_this.enableBridge(bridge));
+          }
+          return _bluebird2.default.all(promises);
         });
       });
     }
@@ -72,6 +79,15 @@ var BrctlWrapper = function () {
       // eslint-disable-line class-methods-use-this
       debug('About to enable bridge: ' + bridge);
       return execCmd('ifconfig ' + bridge + ' up').then(function () {
+        return null;
+      });
+    }
+  }, {
+    key: 'setBridgeIP',
+    value: function setBridgeIP(bridge, ip) {
+      // eslint-disable-line class-methods-use-this
+      debug('About to change bridge ' + bridge + ' IP to: ' + ip);
+      return execCmd('ip addr add dev ' + bridge + ' ' + ip).then(function () {
         return null;
       });
     }

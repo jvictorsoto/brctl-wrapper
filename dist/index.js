@@ -21,7 +21,7 @@ var debug = require('debug')('brctl-wrapper');
 // Helper function to exec commands. TODO: Better error handler with custom error class...
 function execCmd(cmd) {
   debug('About to execute cmd: ' + cmd);
-  return (0, _childProcessEs6Promise.exec)(cmd).then(function (result) {
+  return (0, _childProcessEs6Promise.exec)(cmd, {}).then(function (result) {
     debug('Executed cmd: ' + cmd, result);
     var stdout = result.stdout,
         stderr = result.stderr;
